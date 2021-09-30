@@ -1,24 +1,38 @@
 
-quick_draw_data_set=['pen','paper','book','bottle'];
-random_no = Math.floor((Math.random()*quick_draw_data_set.length)+1);
-element_of_array = quick_draw_data_set[random_no];
-console.log(quick_draw_data_set);
-var sketch=quick_draw_data_set;
-document.getElementById("sketchtbedrawn_p").innerHTML = sketch;
-var timer_counter=0;
-var timer_sketch="";
-var draw_sketch="";
-var answer_holder="";
-var score=0;
 
 function preload() {
-    
+    classifier = ml5.imageClassifier('Doodlenet');
 }
 
 function setup() {
-    
+    canvas = createCanvas(280,200);
+    canvas.center();
+    background("white");
+    canvas.mouseReleased(classifyCanvas);
+    synth=window.speechSynthesis;
+}
+
+function clear_canvas() {
+    background("white");
 }
 
 function draw() {
-    
+ strokeWeight(13);
+ stroke(0);
+ if (mouseIsPressed) {
+    line(pmouseX,pmouseY,mouseX,mouseY);
+ }
+}
+function classifyCanvas() {
+    classifier.classify(canvas,gotResult);
+}
+function gotResult(error,results) {
+    if (error) {
+        console.error(error);
+    }
+    console.log(results);
+    document.getElementById('label').innerHTML = 'Label-' + results[0].label;
+    document.getElementById('confidence').innerHTML = 'Confidence-' + Math.round(results[0].confidence * 100)+'%';
+    utterThis= new SpeechSynthesisUtterance(results[0].label);
+    synth.speak(utterThis);
 }
